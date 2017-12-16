@@ -68,14 +68,15 @@ do
     then
         echo 'Temperature (F): '$(cat $tmp_data | jq -r '.current.temp_f')
         echo 'Feels like (F): '$(cat $tmp_data | jq -r '.current.feelslike_f')
+        echo
+        echo 'Wind (mph): '$(cat $tmp_data | jq -r '.current.wind_mph')
     else
         echo 'Temperature (C): '$(cat $tmp_data | jq -r '.current.temp_c')
         echo 'Feels like (C): '$(cat $tmp_data | jq -r '.current.feelslike_c')
+        echo
+        echo 'Wind (kph): '$(cat $tmp_data | jq -r '.current.wind_kph')
     fi
 
-    echo
-    echo 'Wind (kph): '$(cat $tmp_data | jq -r '.current.wind_kph')
-    echo 'Wind (mph): '$(cat $tmp_data | jq -r '.current.wind_mph')
     echo 'Wind direction: '$(cat $tmp_data | jq -r '.current.wind_dir')
     echo
     echo 'Pressure (hPa): '$(cat $tmp_data | jq -r '.current.pressure_mb')
