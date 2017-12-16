@@ -7,15 +7,19 @@ tmp_data="./tmp/tmp.json"
 location="Poznan"
 update_time=300
 dynamic_update=0
+temp_f=0
 
 #get parameters
-while getopts ":l:d" o; do
+while getopts ":l:d:f" o; do
     case "${o}" in
         l)
             location=${OPTARG}
             ;;
         d)
             dynamic_update=1
+            ;;
+        f)
+            temp_f=1
             ;;
     esac
 done
@@ -56,12 +60,23 @@ echo 'Last update: '$(date -r $tmp_data)
 echo '=================================='
 
 #todo: if dynamic update !!!
-#todo: if -f!!!
-echo 'Temperature(C): '$(cat $tmp_data | jq -r '.current.temp_c')
-echo 'Feels like(C): '$(cat $tmp_data | jq -r '.current.feelslike_c')
-
 echo 'Condition: '$(cat $tmp_data | jq -r '.current.condition.text')
-echo 'Wind(kph): '$(cat $tmp_data | jq -r '.current.wind_kph')
+echo
+
+if [ $temp_f -eq 1 ];
+then
+    echo 'Temperature (F): '$(cat $tmp_data | jq -r '.current.temp_f')
+    echo 'Feels like (F): '$(cat $tmp_data | jq -r '.current.feelslike_f')
+else
+    echo 'Temperature (C): '$(cat $tmp_data | jq -r '.current.temp_c')
+    echo 'Feels like (C): '$(cat $tmp_data | jq -r '.current.feelslike_c')
+fi
+
+echo
+echo 'Wind (kph): '$(cat $tmp_data | jq -r '.current.wind_kph')
+echo 'Wind (mph): '$(cat $tmp_data | jq -r '.current.wind_mph')
+echo 'Wind direction: '$(cat $tmp_data | jq -r '.current.wind_dir')
+echo
 echo 'Pressure(hPa): '$(cat $tmp_data | jq -r '.current.pressure_mb')
 echo 'Humidity: '$(cat $tmp_data | jq -r '.current.humidity')
 echo '=================================='
