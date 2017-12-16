@@ -20,24 +20,48 @@ while getopts ":l:d" o; do
     esac
 done
 
-#check if ./tmp/tmp.json exists or when was last modification
-#and if location is the same!!!
+#check if ./tmp/tmp.json exists or when was last modification 
+#and if location is equal
 #if dynamic update with while and sleep
 
-if [ -f $tmp_data ]
+if [ -f $tmp_data ];
 then
     last_modif_time=$(($(date +%s) - $(date +%s -r $tmp_data)))
+    
+    #check if location is equal
+    checked_loc=$(cat $tmp_data | jq -r '.location.name')
+    if [ "$checked_loc" != "$location" ];
+    then
+        last_modif_time=$(($update_time + 1))
+    fi
 else
     last_modif_time=$(($update_time + 1))
 fi
 
-if [ $last_modif_time -gt $update_time ]
+if [ $last_modif_time -gt $update_time ];
 then
     ready_request=$base_request"?key="$APIXUKEY"&q="$location
-    curl --create-dirs -o $tmp_data $ready_request
+    curl --create-dirs -o $tmp_data $ready_request &> /dev/null
 fi
 
 #show data
-file_data=$(jq . $tmp_data)
+echo '=================================='
+echo 'Actual weather for:'
+echo
+echo $(cat $tmp_data | jq -r '.location.name') | awk '{print toupper($1)}'
+echo $(cat $tmp_data | jq -r '.location.country')
+echo
+echo 'Localtime: '$(cat $tmp_data | jq -r '.location.localtime')
+echo 'Last update: '$(date -r $tmp_data)
+echo '=================================='
 
-echo $($file_data | jq .location)
+#todo: if dynamic update !!!
+#todo: if -f!!!
+echo 'Temperature(C): '$(cat $tmp_data | jq -r '.current.temp_c')
+echo 'Feels like(C): '$(cat $tmp_data | jq -r '.current.feelslike_c')
+
+echo 'Condition: '$(cat $tmp_data | jq -r '.current.condition.text')
+echo 'Wind(kph): '$(cat $tmp_data | jq -r '.current.wind_kph')
+echo 'Pressure(hPa): '$(cat $tmp_data | jq -r '.current.pressure_mb')
+echo 'Humidity: '$(cat $tmp_data | jq -r '.current.humidity')
+echo '=================================='
